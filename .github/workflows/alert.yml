@@ -1,0 +1,39 @@
+name: theqoo-alert
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # 10분마다 (UTC 기준, 간격만 의미 있음)
+  workflow_dispatch:          # 수동 실행 버튼
+
+permissions:
+  contents: write
+
+concurrency:
+  group: theqoo-alert
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Run monitor
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python monitor.py
+
+      - name: Save seen list
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen.json
+          git diff --cached --quiet || (git commit -m "update seen" && git push)
