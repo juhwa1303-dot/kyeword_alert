@@ -2,7 +2,7 @@ name: theqoo-alert
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # 10분마다 (UTC 기준, 간격만 의미 있음)
+    - cron: "7,22,37,52 * * * *"   # 10분마다 (UTC 기준, 간격만 의미 있음)
   workflow_dispatch:          # 수동 실행 버튼
 
 permissions:
