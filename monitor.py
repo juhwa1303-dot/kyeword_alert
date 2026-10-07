@@ -47,7 +47,10 @@ def fetch_posts(board_url):
         if not title or re.fullmatch(r"\[?\d+\]?", title):
             continue
         pid = m.group(1)
-        posts.setdefault(pid, (title, f"https://theqoo.net/{board}/{pid}"))
+        # 말머리 등이 제목 링크 밖에 있어도 잡히도록, 그 글이 속한 줄 전체 텍스트를 검사 대상으로 씁니다
+        row = a.find_parent("tr") or a.find_parent("li")
+        full_text = row.get_text(" ", strip=True) if row else title
+        posts.setdefault(pid, (title, f"https://theqoo.net/{board}/{pid}", full_text))
     return posts
 
 
@@ -74,14 +77,14 @@ def main():
             continue
         ok_count += 1
 
-        for pid, (title, link) in posts.items():
+        for pid, (title, link, full_text) in posts.items():
             key = f"{name}:{pid}"
             if key in seen:
                 continue
             seen.add(key)
             seen_list.append(key)
 
-            hits = [k for k in KEYWORDS if k in title]
+            hits = [k for k in KEYWORDS if k in full_text]
             # 첫 실행에는 기존 글로 알림이 쏟아지지 않도록 기록만 합니다
             if hits and not first_run:
                 send_telegram(f"🔔 [{name}] {', '.join(hits)}\n{title}\n{link}")
