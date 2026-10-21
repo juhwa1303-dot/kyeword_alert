@@ -12,7 +12,7 @@ BOARDS = {
     "영화": "https://theqoo.net/movie",
     "스퀘어": "https://theqoo.net/square",
 }
-KEYWORDS = ["톰", "슾", "스파", "디거"]
+KEYWORDS = ["톰", "슾", "스파이더", "디거"]
 # =========================================
 
 SEEN_FILE = Path("seen.json")
